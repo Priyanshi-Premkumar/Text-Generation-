@@ -1,0 +1,68 @@
+import requests
+from bs4 import BeautifulSoup
+import pandas as pd
+  
+HEADERS = ({'User-Agent':
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) \
+            AppleWebKit/537.36 (KHTML, like Gecko) \
+            Chrome/90.0.4430.212 Safari/537.36',
+            'Accept-Language': 'en-US, en;q=0.5'})
+def getdata(url):
+    r = requests.get(url, headers=HEADERS)
+    return r.text
+  
+def html_code(url):
+    htmldata = getdata(url)
+    soup = BeautifulSoup(htmldata, 'html.parser')
+    return (soup)
+url = "https://www.amazon.in/Columbia-Mens-wind-\
+resistant-Glove/dp/B0772WVHPS/?_encoding=UTF8&pd_rd\
+_w=d9RS9&pf_rd_p=3d2ae0df-d986-4d1d-8c95-aa25d2ade606&pf\
+_rd_r=7MP3ZDYBBV88PYJ7KEMJ&pd_rd_r=550bec4d-5268-41d5-\
+87cb-8af40554a01e&pd_rd_wg=oy8v8&ref_=pd_gw_cr_cartx&th=1"
+  
+soup = html_code(url)
+
+HEADERS = ({'User-Agent':
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) \
+            AppleWebKit/537.36 (KHTML, like Gecko) \
+            Chrome/90.0.4430.212 Safari/537.36',
+            'Accept-Language': 'en-US, en;q=0.5'})
+
+def getdata(url):
+    r = requests.get(url, headers=HEADERS)
+    return r.text
+def html_code(url):
+    htmldata = getdata(url)
+    soup = BeautifulSoup(htmldata, 'html.parser')
+    return (soup)
+
+fold_url="https://www.amazon.in/Samsung-Phantom-Storage-Additional-Exchange/product-reviews/B09CQ3GSJ1/ref=cm_cr_dp_d_show_all_btm?ie=UTF8&reviewerType=all_reviews"
+flip_url="https://www.amazon.in/Samsung-Galaxy-Storage-Additional-Exchange/product-reviews/B09CQ2TPDQ/ref=cm_cr_arp_d_viewopt_srt?ie=UTF8&reviewerType=all_reviews&pageNumber=1&sortBy=recent"
+
+fold_soup = html_code(fold_url)
+flip_soup = html_code(flip_url)
+
+def cus_rev(soup):
+    data_str = ""
+    for item in soup.find_all("span", class_="a-size-base review-text review-text-content"):
+        data_str = data_str + item.get_text()
+    result = data_str.split("\n")
+    return (result)
+rev_data_flip = cus_rev(flip_soup)
+rev_data_fold = cus_rev(fold_soup)
+rev_result_flip = []
+rev_result_fold = []
+for i in rev_data_flip:
+  if i!="":
+    rev_result_flip.append(i)
+for i in rev_data_fold:
+  if i!="":
+    rev_result_fold.append(i)
+
+flip_data = {'review': rev_result_flip}
+fold_data= {'review': rev_result_fold}
+df_flip = pd.DataFrame(flip_data)
+df_fold = pd.DataFrame(fold_data)
+df_flip.to_csv('amazon_flip_review.csv')
+df_fold.to_csv('amazon_fold_review.csv')
